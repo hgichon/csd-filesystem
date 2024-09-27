@@ -1,0 +1,178 @@
+syntax="proto3";
+
+package lba2pba;
+
+service DBFileAgent{
+	rpc GetPba (FAGetPbaRequest) returns (FAGetPbaResponse);
+	rpc PushFile (FAPushRequest) returns (FAPushResponse);
+}
+
+service DBFileManager{
+	rpc RegisterQA (FMRegisterQARequest) returns (FMRegisterQAResponse);
+	rpc DeregisterQA (FMDeregisterQARequest) returns (FMDeregisterQAResponse);
+	rpc CreatePvc (CreatePvcRequest) returns (CreatePvcResponse);
+	rpc DeletePvc (DeletePvcRequest) returns (DeletePvcResponse);
+	rpc GetFileMap (FMGetFileMapRequest) returns (FMGetFileMapResponse);
+	rpc PushPba (FMPushPbaRequest) returns (FMPushPbaResponse);
+}
+
+service Trace{
+	rpc TChangeFile (TChangeRequest) returns (TChangeResponse);
+	rpc TGetFileMap(TGetFileMapRequest) returns (TGetFileMapResponse);
+	rpc TRegister(TRegisterRequest) returns (TRegisterResponse);
+	rpc TDeregister(TDeregisterRequest) returns (TDeregisterResponse);
+}
+
+
+service Worker{
+	rpc WInit(WInitRequest) returns (WInitResponse);
+}
+
+message PBA{
+    string disk = 1;
+    string host = 2;
+    int64 offset = 3;
+    int64 length = 4;
+    int64 major = 5;
+    int64 minor = 6;
+}
+
+message ReplicaPba{
+	repeated PBA pba = 1;
+	string Node = 2;
+}
+
+message FilePBA{
+	repeated PBA pba = 1;
+	repeated ReplicaPba rPba = 2;
+	string fileName = 3;
+	string volName = 4;
+	string type = 5;
+}
+
+
+message FileMap {
+    repeated FilePBA filePba = 1;
+}
+
+message WInitRequest{
+	string signal = 1;
+}
+
+message WInitResponse{
+	repeated FilePBA filePba = 1;
+}
+
+message TGetFileMapRequest{
+	string signal = 1;
+}
+
+message TGetFileMapResponse{
+	FileMap fileMap = 1;
+}
+
+message TChangeRequest{
+	string action = 1;
+	FilePBA filePba = 2;
+}
+
+message TChangeResponse{
+	string res = 1;
+}
+
+message TRegisterRequest{
+	string addr = 1;
+}
+
+message TRegisterResponse{
+	string res = 1;
+}
+
+message TDeregisterRequest{
+	string addr = 1;
+}
+
+message TDeregisterResponse{
+	string res = 1;
+}
+
+message FAGetPbaRequest{
+	message Request{
+		string fileName = 1;
+		int64 offset = 2;
+		int64 length = 3;
+	}
+
+	repeated Request requests = 1;
+}
+
+message FAGetPbaResponse{
+	repeated FilePBA filePba = 1;
+}
+
+message FAPushRequest{
+	string action = 1;
+	FilePBA filePba = 2;
+}
+
+message FMRegisterQARequest{
+	string addr = 1;
+}
+
+message FMRegisterQAResponse{
+	string res = 1;
+}
+
+message FMDeregisterQARequest{
+	string addr = 1;
+}
+
+message FMDeregisterQAResponse{
+	string res = 1;
+}
+
+message FAPushResponse{
+	string msg = 1;
+	string status = 2;
+}
+
+message FMGetFileMapRequest{
+	string ip = 1;
+	repeated string fileList = 2;
+}
+
+message FMGetFileMapResponse{
+	FileMap fileMap = 1;
+}
+
+message FMPushPbaRequest{
+	string action = 1;	
+	FilePBA filePba = 2;
+}
+
+message FMPushPbaResponse{
+	string msg = 1;
+	string status = 2;
+}
+
+message CreatePvcRequest{
+	string pvcName = 1;
+	string pvcType = 2;
+	string dupliType = 3;
+}
+
+message CreatePvcResponse{
+	string msg = 1;
+	string pvcName = 2;
+}
+
+message DeletePvcRequest{
+	string pvcName = 1;
+}
+
+message DeletePvcResponse{
+	string msg = 1;
+	string pvcName =2;
+}
+
+
